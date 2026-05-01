@@ -3,1384 +3,694 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SoleBot — Automated Shoe Care Intelligence</title>
+<title>SoleBot — Intelligent Shoe Care</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
-:root {
-  --ink: #0a0a0a;
-  --paper: #f5f2ec;
-  --gold: #c9a84c;
-  --gold-light: #e8d5a0;
-  --steel: #1c2a3a;
-  --mist: #e8e4dc;
-  --accent: #c9a84c;
-  --red: #b84040;
-  --mono: 'DM Mono', monospace;
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --sans: 'Syne', sans-serif;
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#050608;
+  --deep:#0a0d14;
+  --navy:#0d1420;
+  --gold:#d4a843;
+  --gold2:#f0c96a;
+  --cream:#f4efe6;
+  --mist:#e8e2d8;
+  --steel:#1a2535;
+  --text:#f0ece4;
+  --dim:rgba(240,236,228,0.45);
+  --serif:'Playfair Display',Georgia,serif;
+  --sans:'Space Grotesk',sans-serif;
+  --mono:'JetBrains Mono',monospace;
 }
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--sans);
-  overflow-x: hidden;
-  cursor: none;
-}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:var(--sans);overflow-x:hidden;cursor:auto;}
 
 /* Custom cursor */
-.cursor {
-  position: fixed;
-  width: 8px; height: 8px;
-  background: var(--gold);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
-  mix-blend-mode: multiply;
-}
-.cursor-ring {
-  position: fixed;
-  width: 32px; height: 32px;
-  border: 1px solid var(--gold);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  transition: transform 0.15s ease-out, width 0.3s, height 0.3s, opacity 0.3s;
-  opacity: 0.6;
+#cur{position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s;mix-blend-mode:screen}
+#cur-r{position:fixed;width:36px;height:36px;border:1px solid rgba(212,168,67,.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s}
+
+/* ENGINEERING BANNER */
+.engineering-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 2000;
+  background: var(--gold); color: var(--black);
+  text-align: center; padding: 8px 16px;
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
 }
 
 /* NAV */
-nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 20px 48px;
-  display: flex; align-items: center; justify-content: space-between;
-  mix-blend-mode: multiply;
-}
-.nav-logo {
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.nav-links { display: flex; gap: 36px; }
-.nav-links a {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink);
-  text-decoration: none;
-  letter-spacing: 0.08em;
-  opacity: 0.55;
-  transition: opacity 0.2s;
-}
-.nav-links a:hover { opacity: 1; }
+nav{position:fixed;top:28px;left:0;right:0;z-index:1000;padding:20px 60px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(5,6,8,.95) 0%,transparent 100%);backdrop-filter:blur(4px)}
+.logo{font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:.05em;color:var(--text)}
+.logo span{color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:32px}
+.nav-link{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);text-decoration:none;transition:color .2s}
+.nav-link:hover{color:var(--gold)}
+.nav-cta{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--black);background:var(--gold);padding:10px 24px;text-decoration:none;transition:background .2s;text-transform:uppercase}
+.nav-cta:hover{background:var(--gold2)}
 
-/* HERO */
+/* HERO SECTION */
 .hero {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-left {
-  background: var(--steel);
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 80px 64px;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-left::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: 
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 39px,
-      rgba(201,168,76,0.06) 39px,
-      rgba(201,168,76,0.06) 40px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 39px,
-      rgba(201,168,76,0.06) 39px,
-      rgba(201,168,76,0.06) 40px
-    );
-  pointer-events: none;
-}
-
-.hero-eyebrow {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: var(--gold);
-  text-transform: uppercase;
-  margin-bottom: 28px;
-  display: flex; align-items: center; gap: 12px;
-}
-.hero-eyebrow::before {
-  content: '';
-  display: block; width: 32px; height: 1px;
-  background: var(--gold);
-}
-
-.hero-h1 {
-  font-family: var(--serif);
-  font-size: clamp(52px, 6vw, 80px);
-  font-weight: 300;
-  line-height: 1.05;
-  color: #f5f2ec;
-  margin-bottom: 32px;
-}
-.hero-h1 em { font-style: italic; color: var(--gold); }
-
-.hero-sub {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: rgba(245,242,236,0.45);
-  letter-spacing: 0.05em;
-  line-height: 1.8;
-  max-width: 340px;
-  margin-bottom: 48px;
-}
-
-.hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; }
-
-.btn-primary {
-  background: var(--gold);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  padding: 16px 32px;
-  border: none;
-  cursor: none;
-  transition: background 0.2s, transform 0.2s;
-  text-decoration: none;
-  display: inline-block;
-}
-.btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
-
-.btn-ghost {
-  background: transparent;
-  color: rgba(245,242,236,0.6);
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  padding: 15px 32px;
-  border: 1px solid rgba(245,242,236,0.2);
-  cursor: none;
-  transition: border-color 0.2s, color 0.2s;
-  text-decoration: none;
-  display: inline-block;
-}
-.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
-
-.hero-right {
-  background: var(--paper);
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  padding: 120px 64px 80px;
+  min-height: 100vh; padding: 140px 60px 80px;
+  display: flex; align-items: center; justify-content: space-between; gap: 60px;
   position: relative;
 }
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(212,168,67,.07) 0%,transparent 70%); pointer-events:none;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(212,168,67,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(212,168,67,.04) 1px,transparent 1px);background-size:80px 80px;animation:gridshift 20s linear infinite; pointer-events:none;}
+@keyframes gridshift{0%{transform:translateY(0)}100%{transform:translateY(80px)}}
 
-.machine-viz {
-  width: 280px; height: 380px;
-  position: relative;
-  margin-bottom: 40px;
-}
+.hero-left { flex: 1.2; position: relative; z-index: 10; max-width: 650px; }
+.hero-badge{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);padding:8px 20px;border:1px solid rgba(212,168,67,.25);margin-bottom:32px;}
+.badge-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.6)}}
+.hero-h1{font-family:var(--serif);font-size:clamp(48px,6vw,90px);font-weight:900;line-height:1;margin-bottom:24px;}
+.hero-h1 em{font-style:italic;color:var(--gold);display:block}
+.hero-h1 .outline{-webkit-text-stroke:1px rgba(240,236,228,.25);color:transparent}
+.hero-sub{font-family:var(--sans);font-size:15px;color:var(--dim);line-height:1.7;margin-bottom:40px;font-weight:300;}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;}
+.btn-g{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--black);background:var(--gold);padding:16px 36px;text-decoration:none;transition:all .25s;border:none;cursor:pointer}
+.btn-g:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn-o{font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:transparent;padding:15px 36px;text-decoration:none;border:1px solid rgba(212,168,67,.4);transition:all .25s;cursor:pointer}
+.btn-o:hover{border-color:var(--gold);background:rgba(212,168,67,.05)}
 
-.machine-body {
-  position: absolute;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  width: 200px; height: 300px;
-  background: var(--steel);
-  border-radius: 16px 16px 8px 8px;
-  display: flex; flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-}
+.hero-right { flex: 1; position: relative; z-index: 10; display: flex; flex-direction: column; gap: 30px; }
+.hero-stats-box { background: var(--cream); border-radius: 8px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); display: flex; justify-content: space-between; }
+.hs-item { text-align: center; }
+.hs-val { font-family: var(--serif); font-size: 36px; color: var(--black); line-height: 1; }
+.hs-val sub { font-size: 14px; color: var(--gold); }
+.hs-lab { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-top: 8px; }
 
-.machine-screen {
-  width: 160px; height: 90px;
-  background: #0f1f2e;
-  border-radius: 4px;
-  margin-top: 24px;
-  border: 1px solid rgba(201,168,76,0.3);
-  position: relative;
-  overflow: hidden;
-}
+.hero-machine-ui { background: var(--steel); border: 1px solid rgba(212,168,67,0.2); border-radius: 8px; padding: 24px; position: relative; overflow: hidden; }
+.hm-header { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 9px; color: var(--gold); border-bottom: 1px solid rgba(212,168,67,0.2); padding-bottom: 12px; margin-bottom: 16px; letter-spacing: 0.1em;}
+.hm-body { font-family: var(--mono); font-size: 11px; color: var(--dim); line-height: 1.8; }
+.hm-body span { color: var(--text); }
+.hm-highlight { color: #5daa7f !important; }
+.scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: var(--gold); opacity: 0.5; animation: scanLoop 3s linear infinite; }
+@keyframes scanLoop { 0% { top: 0; } 100% { top: 100%; } }
 
-.screen-line {
-  position: absolute;
-  left: 12px; right: 12px;
-  height: 1px;
-  background: rgba(201,168,76,0.4);
-  animation: scanline 3s linear infinite;
-}
-@keyframes scanline {
-  0% { top: 0; opacity: 1; }
-  100% { top: 90px; opacity: 0; }
-}
+/* SECTIONS BASE */
+.sec{padding:120px 60px;position:relative}
+.sec-tag{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.sec-tag::before{content:'';width:28px;height:1px;background:var(--gold)}
+.sec-h2{font-family:var(--serif);font-size:clamp(32px,5vw,56px);font-weight:700;line-height:1.1;margin-bottom:16px}
+.sec-h2 em{font-style:italic;color:var(--gold)}
+.sec-lead{font-family:var(--sans);font-size:15px;color:var(--dim);line-height:1.8;font-weight:300;max-width:520px}
 
-.screen-text {
-  position: absolute;
-  top: 12px; left: 12px;
-  font-family: var(--mono);
-  font-size: 8px;
-  color: var(--gold);
-  line-height: 1.6;
-  letter-spacing: 0.05em;
-}
+/* WHY SOLEBOT SECTION */
+.why-sec { background: var(--black); border-top: 1px solid rgba(212,168,67,0.1); }
+.why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; margin-top: 60px; }
+.why-card { background: var(--deep); border: 1px solid rgba(212,168,67,0.1); border-radius: 12px; overflow: hidden; transition: transform 0.3s ease, border-color 0.3s ease; }
+.why-card:hover { transform: translateY(-10px); border-color: rgba(212,168,67,0.4); }
+.why-img { width: 100%; height: 240px; overflow: hidden; position: relative; }
+.why-img img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7); transition: 0.5s ease; }
+.why-card:hover .why-img img { filter: brightness(1); transform: scale(1.05); }
+.why-content { padding: 32px; }
+.why-content h3 { font-family: var(--serif); font-size: 24px; color: var(--gold); margin-bottom: 12px; }
+.why-content p { font-family: var(--sans); font-size: 14px; color: var(--dim); line-height: 1.7; font-weight: 300; }
 
-.machine-slot {
-  width: 120px; height: 28px;
-  background: #0a1520;
-  border-radius: 4px;
-  margin-top: 20px;
-  border: 1px solid rgba(201,168,76,0.2);
-  display: flex; align-items: center; justify-content: center;
-}
-.machine-slot span {
-  font-family: var(--mono);
-  font-size: 7px;
-  color: rgba(201,168,76,0.5);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
+/* THE PROCESS */
+.process-sec{background:var(--deep);overflow:hidden}
+.gates{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.08); margin-top: 60px;}
+.gate-card{background:var(--deep);padding:48px 36px;position:relative;overflow:hidden;transition:background .3s}
+.gate-card:hover{background:#0f1620}
+.gate-num{font-family:var(--serif);font-size:100px;font-weight:900;font-style:italic;position:absolute;top:-16px;right:16px;color:rgba(212,168,67,.05);line-height:1;pointer-events:none}
+.gate-icon{width:48px;height:48px;border:1px solid rgba(212,168,67,.2);display:flex;align-items:center;justify-content:center;margin-bottom:24px;font-size:20px}
+.gate-label{font-family:var(--mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.gate-title{font-family:var(--serif);font-size:24px;font-weight:700;margin-bottom:14px;line-height:1.2}
+.gate-desc{font-family:var(--sans);font-size:13px;color:var(--dim);line-height:1.75;font-weight:300}
 
-.machine-bays {
-  display: flex; gap: 8px;
-  margin-top: 20px;
-}
-.bay {
-  width: 28px; height: 36px;
-  background: #0a1520;
-  border-radius: 3px;
-  border: 1px solid rgba(201,168,76,0.15);
-  position: relative;
-  overflow: hidden;
-}
-.bay.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 100%;
-  background: rgba(201,168,76,0.15);
-  animation: pulse-bay 2s ease-in-out infinite;
-}
-@keyframes pulse-bay {
-  0%, 100% { height: 20%; opacity: 0.4; }
-  50% { height: 100%; opacity: 0.8; }
-}
+/* CLUSTER SCALING DEMO */
+.scale-section { background: var(--black); padding: 100px 60px; border-top: 1px solid rgba(212,168,67,0.05); }
+.scale-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; margin-top: 40px; }
+.bay-unit { height: 180px; background: #080b12; border: 1px solid rgba(212,168,67,0.1); position: relative; overflow: hidden; transition: 0.5s; border-radius: 4px; }
+.bay-unit.active { border-color: var(--gold); background: #0d121c; box-shadow: inset 0 0 30px rgba(212,168,67,0.05); }
+.shoe-cluster-holo { position: absolute; top: 110%; left: 50%; transform: translateX(-50%); font-size: 40px; opacity: 0; filter: sepia(1) saturate(5) hue-rotate(15deg) brightness(1.2) drop-shadow(0 0 8px var(--gold)); transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.active .shoe-cluster-holo { top: 35%; opacity: 0.8; animation: flicker 0.2s 2; }
+@keyframes flicker { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+.bay-beam { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--gold); opacity: 0; pointer-events: none; }
+.active .bay-beam { opacity: 0.5; animation: bayScan 2s linear infinite; }
+@keyframes bayScan { 0% { top: 10%; } 100% { top: 90%; } }
+.bay-label { position: absolute; bottom: 10px; left: 10px; font-family: var(--mono); font-size: 8px; color: var(--gold); opacity: 0.4; text-transform: uppercase; }
+.active .bay-label { opacity: 1; font-weight: bold; }
+.btn-controls { margin-top: 20px; display: flex; gap: 15px; position: relative; z-index: 50; }
 
-.machine-base {
-  width: 220px; height: 20px;
-  background: #111d29;
-  border-radius: 0 0 12px 12px;
-  margin-top: auto;
-  display: flex; align-items: center; justify-content: center;
-}
-.machine-base-line {
-  width: 60px; height: 2px;
-  background: var(--gold);
-  border-radius: 1px;
-  opacity: 0.4;
-}
+/* LIVE SERVICE SIMULATION */
+.sim-section{background:linear-gradient(180deg,var(--deep) 0%,var(--black) 100%);padding:100px 60px}
+.sim-header-wrap { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+.btn-sim-start { background: var(--gold); color: var(--black); border: none; padding: 16px 32px; font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px rgba(212,168,67,0.3); }
+.btn-sim-start:disabled { background: var(--mist); color: #888; cursor: not-allowed; box-shadow: none; }
 
-/* Floating data cards */
-.data-card {
-  position: absolute;
-  background: white;
-  border: 1px solid var(--mist);
-  padding: 12px 16px;
-  font-family: var(--mono);
-  font-size: 10px;
-  line-height: 1.6;
-  animation: float 4s ease-in-out infinite;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-}
-.data-card-1 { top: 20px; right: -10px; animation-delay: 0s; }
-.data-card-2 { bottom: 40px; left: -30px; animation-delay: 1.5s; }
+.sim-wrapper{display:grid;grid-template-columns:1fr 1.2fr;gap:60px;align-items:start;}
+.sim-screen{background:#050810;border:1px solid rgba(212,168,67,.15);border-radius:12px;overflow:hidden;position:sticky;top:120px}
+.sim-header{background:#0a0d18;padding:16px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(212,168,67,.08)}
+.sim-dots{display:flex;gap:6px}
+.sim-dot{width:10px;height:10px;border-radius:50%}
+.sim-title{font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--dim);margin-left:auto}
+.sim-body{padding:24px}
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-}
-.data-label { color: #888; letter-spacing: 0.1em; text-transform: uppercase; font-size: 9px; }
-.data-value { color: var(--ink); font-size: 14px; font-weight: 400; margin-top: 2px; }
-.data-value span { color: var(--gold); }
+/* The Animated Chamber */
+.sim-chamber { position: relative; width: 100%; height: 260px; background: #020305; border-radius: 8px; margin-bottom: 24px; overflow: hidden; border: 1px solid rgba(212,168,67,.2); display: flex; justify-content: center; }
+.sim-mesh-base { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(212,168,67,.08) 5px, rgba(212,168,67,.08) 6px); border-top: 2px solid var(--gold); z-index: 10; }
+.sim-chamber-shoe { position: absolute; bottom: 35px; width: 220px; height: 160px; object-fit: contain; transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1), filter 1s ease; transform: translateY(-300px); opacity: 0; z-index: 5; }
+.sim-chamber-shoe.dropped { transform: translateY(0); opacity: 1; }
+.sim-chamber-shoe.shaking { animation: chamberShake 0.15s infinite; }
 
-.hero-stats {
-  display: flex; gap: 0;
-  width: 100%;
-  border-top: 1px solid var(--mist);
-  padding-top: 32px;
-}
-.hero-stat {
-  flex: 1;
-  padding: 0 20px;
-  border-right: 1px solid var(--mist);
-}
-.hero-stat:first-child { padding-left: 0; }
-.hero-stat:last-child { border-right: none; }
-.stat-n {
-  font-family: var(--serif);
-  font-size: 36px;
-  font-weight: 300;
-  color: var(--ink);
-  line-height: 1;
-}
-.stat-n sub { font-size: 16px; vertical-align: baseline; margin-left: 2px; }
-.stat-label {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: #888;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  margin-top: 4px;
-}
+/* Dynamic Dirty Filter for White Sneaker */
+.sim-chamber-shoe.dirty-state { filter: sepia(0.6) brightness(0.6) contrast(1.3) opacity(0.9); }
 
-/* SECTION BASE */
-section { padding: 120px 80px; }
-.section-tag {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: var(--gold);
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  display: flex; align-items: center; gap: 12px;
-}
-.section-tag::before { content: ''; display: block; width: 24px; height: 1px; background: var(--gold); }
-.section-h2 {
-  font-family: var(--serif);
-  font-size: clamp(36px, 4vw, 56px);
-  font-weight: 300;
-  line-height: 1.1;
-  margin-bottom: 20px;
-}
-.section-h2 em { font-style: italic; color: var(--gold); }
-.section-lead {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: #666;
-  line-height: 1.9;
-  max-width: 480px;
-}
+@keyframes chamberShake { 0% { transform: translate(2px, 1px) rotate(0deg); } 50% { transform: translate(-1px, -2px) rotate(-1deg); } 100% { transform: translate(-3px, 0px) rotate(1deg); } }
 
-/* HOW IT WORKS */
-.how-section {
-  background: var(--steel);
-  color: var(--paper);
-  position: relative;
-  overflow: hidden;
-}
-.how-section::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(
-    90deg, transparent, transparent 79px,
-    rgba(201,168,76,0.04) 79px, rgba(201,168,76,0.04) 80px
-  );
-  pointer-events: none;
-}
-.how-section .section-lead { color: rgba(245,242,236,0.45); }
+/* Chamber FX */
+.sim-flash { position: absolute; inset: 0; background: white; opacity: 0; z-index: 20; pointer-events: none; }
+.sim-flash.active { animation: camFlash 0.4s 3; }
+@keyframes camFlash { 0% { opacity: 0.9; } 100% { opacity: 0; } }
 
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1px;
-  background: rgba(201,168,76,0.12);
-  margin-top: 72px;
-  border: 1px solid rgba(201,168,76,0.12);
-}
+.sim-laser { position: absolute; top: -10px; left: 0; width: 100%; height: 2px; background: var(--gold); box-shadow: 0 0 15px var(--gold); opacity: 0; z-index: 15; }
+.sim-laser.active { opacity: 1; animation: scanDown 2s ease-in-out infinite; }
+@keyframes scanDown { 0% { top: 10%; } 50% { top: 90%; } 100% { top: 10%; } }
 
-.step-card {
-  background: var(--steel);
-  padding: 40px 32px;
-  position: relative;
-  transition: background 0.3s;
-}
-.step-card:hover { background: #243447; }
+.sim-foam { position: absolute; bottom: 40px; left: 0; width: 100%; height: 0; background: rgba(240, 246, 255, 0.95); transition: height 1.5s ease; z-index: 12; }
+.sim-foam.active { height: 180px; }
 
-.step-number {
-  font-family: var(--serif);
-  font-size: 64px;
-  font-weight: 300;
-  color: rgba(201,168,76,0.12);
-  line-height: 1;
-  margin-bottom: 24px;
-  font-style: italic;
-}
-.step-tag {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--gold);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-}
-.step-title {
-  font-family: var(--sans);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--paper);
-  margin-bottom: 12px;
-}
-.step-desc {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: rgba(245,242,236,0.45);
-  line-height: 1.8;
-}
-.step-badge {
-  display: inline-block;
-  margin-top: 16px;
-  font-family: var(--mono);
-  font-size: 9px;
-  padding: 4px 10px;
-  background: rgba(201,168,76,0.12);
-  color: var(--gold);
-  letter-spacing: 0.1em;
-  border: 1px solid rgba(201,168,76,0.2);
-}
+.sim-done-glow { position: absolute; inset: 0; background: radial-gradient(circle, rgba(93,170,127,0.2) 0%, transparent 70%); opacity: 0; transition: 1s; z-index: 2; }
+.sim-done-glow.active { opacity: 1; }
 
-/* CLEANING MODES */
-.modes-section { background: var(--paper); }
+/* BEFORE / AFTER OVERLAY */
+.ba-container { position: absolute; inset: 0; z-index: 30; display: flex; background: rgba(2,3,5,0.95); backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.8s ease; pointer-events: none; padding: 20px; gap: 20px; align-items: center; justify-content: center; }
+.ba-container.active { opacity: 1; pointer-events: all; }
+.ba-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.ba-label { font-family: var(--mono); font-size: 9px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.15em; }
+.ba-img { width: 100%; height: 120px; object-fit: contain; border-radius: 4px; border: 1px solid rgba(212,168,67,0.2); background: #0a0d14; padding: 10px; }
+.ba-img.dirty-state { filter: sepia(0.6) brightness(0.6) contrast(1.3); }
 
-.modes-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: var(--mist);
-  margin-top: 64px;
-  border: 1px solid var(--mist);
-}
+/* Text readout below chamber */
+.sim-phase-text{display:none}
+.sim-phase-text.active{display:block; animation: fadeup 0.4s forwards;}
+@keyframes fadeup { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.mode-card {
-  background: var(--paper);
-  padding: 48px 40px;
-  cursor: none;
-  transition: background 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-.mode-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--gold);
-  transform: scaleX(0);
-  transition: transform 0.4s;
-}
-.mode-card:hover::after { transform: scaleX(1); }
-.mode-card:hover { background: #f9f6ef; }
+.sim-status{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sim-status::before{content:'';width:6px;height:6px;background:var(--gold);border-radius:50%;animation:pulse 1.5s infinite}
+.sim-status.done{color:#5daa7f;}
+.sim-status.done::before{background:#5daa7f; animation:none;}
+.sim-h{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:6px;line-height:1.2}
+.sim-p{font-family:var(--sans);font-size:12px;color:var(--dim);line-height:1.7;margin-bottom:16px;font-weight:300}
+.sim-prog{height:3px;background:rgba(212,168,67,.1);border-radius:1px;margin-top:16px;overflow:hidden}
+.sim-prog-fill{height:100%;background:var(--gold);border-radius:1px;transition:width 0.5s ease}
 
-.mode-icon {
-  width: 48px; height: 48px;
-  border: 1px solid var(--mist);
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 24px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--gold);
-  letter-spacing: 0.1em;
-}
+/* Sidebar Steps */
+.sim-steps{display:flex;flex-direction:column;gap:0}
+.sim-step{padding:20px 0;border-bottom:1px solid rgba(212,168,67,.06);display:flex;gap:20px;align-items:flex-start;transition:all .25s; opacity: 0.5; }
+.sim-step:last-child{border-bottom:none}
+.sim-step.active{opacity: 1; padding-left: 8px;}
+.ss-num{width:32px;height:32px;background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.15);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--gold);flex-shrink:0;font-weight:600;transition:all .3s}
+.sim-step.active .ss-num{background:var(--gold);color:var(--black)}
+.ss-body{flex:1}
+.ss-title{font-family:var(--sans);font-size:15px;font-weight:600;margin-bottom:4px}
+.ss-desc{font-family:var(--sans);font-size:13px;color:var(--dim);line-height:1.7;font-weight:300}
 
-.mode-label {
-  font-family: var(--mono);
-  font-size: 9px;
-  color: var(--gold);
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.mode-title {
-  font-family: var(--serif);
-  font-size: 28px;
-  font-weight: 400;
-  line-height: 1.2;
-  margin-bottom: 16px;
-}
-.mode-desc {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: #666;
-  line-height: 1.85;
-  margin-bottom: 24px;
-}
-.mode-specs {
-  display: flex; flex-direction: column; gap: 6px;
-}
-.mode-spec {
-  display: flex; justify-content: space-between;
-  font-family: var(--mono); font-size: 10px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--mist);
-}
-.spec-k { color: #999; letter-spacing: 0.05em; }
-.spec-v { color: var(--ink); font-weight: 400; }
+/* REVEAL ANIMATIONS */
+.rz{opacity:0;transform:translateY(20px);transition:all .8s ease}
+.rz.vis{opacity:1;transform:translateY(0)}
+.rz-l{opacity:0;transform:translateX(-20px);transition:all .8s ease}
+.rz-l.vis{opacity:1;transform:translateX(0)}
+.rz-r{opacity:0;transform:translateX(20px);transition:all .8s ease}
+.rz-r.vis{opacity:1;transform:translateX(0)}
+.delay1{transition-delay:.1s}
+.delay2{transition-delay:.2s}
+.delay3{transition-delay:.3s}
 
-/* DETECTION */
-.detect-section {
-  background: var(--ink);
-  color: var(--paper);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  padding: 0;
+/* RESPONSIVE DESIGN */
+@media (max-width: 900px) {
+  .engineering-banner { font-size: 8px; letter-spacing: 0.1em; }
+  nav { padding: 16px 24px; top: 24px; }
+  .nav-right { display: none; }
+  
+  .hero { flex-direction: column; padding: 120px 24px 60px; text-align: center; gap: 40px; }
+  .hero-left, .hero-right { width: 100%; max-width: 100%; flex: none; }
+  .hero-badge { justify-content: center; }
+  .hero-btns { justify-content: center; }
+  
+  .why-grid, .gates, .sim-wrapper { grid-template-columns: 1fr; }
+  .sim-header-wrap { flex-direction: column; align-items: flex-start; gap: 20px; }
+  .sec { padding: 80px 24px; }
+  
+  .sim-screen { position: relative; top: 0; }
+  .hero-stats-box { flex-direction: column; gap: 20px; text-align: center; }
+  .ba-container { flex-direction: column; }
 }
-.detect-left {
-  padding: 120px 80px;
-  display: flex; flex-direction: column; justify-content: center;
-}
-.detect-left .section-lead { color: rgba(245,242,236,0.45); }
-.detect-right {
-  padding: 80px 64px;
-  background: #0f0f0f;
-  display: flex; flex-direction: column; justify-content: center;
-}
-
-.terminal {
-  background: #0a0a0a;
-  border: 1px solid rgba(201,168,76,0.15);
-  padding: 24px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: rgba(245,242,236,0.6);
-  line-height: 2;
-  position: relative;
-}
-.terminal::before {
-  content: 'SOLEBOT OS v2.1 — LIVE';
-  position: absolute;
-  top: -1px; left: 24px;
-  background: #0a0a0a;
-  padding: 0 8px;
-  font-size: 9px;
-  color: var(--gold);
-  letter-spacing: 0.15em;
-}
-.t-line { display: flex; gap: 12px; }
-.t-prompt { color: var(--gold); flex-shrink: 0; }
-.t-out { color: rgba(245,242,236,0.45); }
-.t-ok { color: #5daa7f; }
-.t-warn { color: #e8a84c; }
-.t-high { color: var(--paper); }
-.t-blink {
-  display: inline-block;
-  width: 6px; height: 12px;
-  background: var(--gold);
-  animation: blink 1s step-end infinite;
-  vertical-align: middle;
-  margin-left: 2px;
-}
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-.detect-metrics {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 16px; margin-top: 40px;
-}
-.d-metric {
-  padding: 20px;
-  border: 1px solid rgba(201,168,76,0.1);
-}
-.d-metric-label {
-  font-family: var(--mono); font-size: 9px;
-  color: rgba(201,168,76,0.6); letter-spacing: 0.2em;
-  text-transform: uppercase; margin-bottom: 8px;
-}
-.d-metric-val {
-  font-family: var(--serif); font-size: 32px;
-  font-weight: 300; color: var(--paper);
-}
-.d-metric-unit { font-size: 14px; color: rgba(245,242,236,0.4); }
-
-/* LUXURY */
-.luxury-section {
-  background: var(--paper);
-  display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0;
-}
-.luxury-left {
-  background: #f0ece3;
-  padding: 120px 80px;
-  display: flex; flex-direction: column; justify-content: center;
-  position: relative; overflow: hidden;
-}
-.luxury-left::before {
-  content: '₹';
-  position: absolute;
-  right: -20px; bottom: -40px;
-  font-family: var(--serif);
-  font-size: 280px;
-  font-style: italic;
-  color: rgba(201,168,76,0.06);
-  line-height: 1;
-  pointer-events: none;
-}
-.luxury-right {
-  padding: 120px 80px;
-  display: flex; flex-direction: column; justify-content: center;
-}
-
-.luxury-features { display: flex; flex-direction: column; gap: 0; margin-top: 40px; }
-.luxury-feat {
-  display: flex; gap: 24px; padding: 24px 0;
-  border-bottom: 1px solid var(--mist);
-  align-items: flex-start;
-}
-.luxury-feat:last-child { border-bottom: none; }
-.lf-num {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--gold); letter-spacing: 0.1em;
-  flex-shrink: 0; padding-top: 3px;
-}
-.lf-title { font-family: var(--sans); font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-.lf-desc { font-family: var(--mono); font-size: 11px; color: #666; line-height: 1.7; }
-
-.shoe-price-chart { margin-top: 32px; }
-.price-bar { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-.bar-label { font-family: var(--mono); font-size: 10px; color: #888; width: 80px; flex-shrink: 0; }
-.bar-track { flex: 1; height: 6px; background: var(--mist); border-radius: 0; }
-.bar-fill { height: 100%; background: var(--gold); border-radius: 0; transition: width 1.5s ease-out; }
-.bar-value { font-family: var(--mono); font-size: 10px; color: var(--ink); width: 60px; text-align: right; flex-shrink: 0; }
-
-/* SPECS / MANUFACTURER */
-.specs-section { background: var(--steel); color: var(--paper); }
-
-.specs-table {
-  margin-top: 64px;
-  border: 1px solid rgba(201,168,76,0.12);
-  width: 100%;
-}
-.spec-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  border-bottom: 1px solid rgba(201,168,76,0.08);
-}
-.spec-row:last-child { border-bottom: none; }
-.spec-row.header { background: rgba(201,168,76,0.06); }
-.spec-cell {
-  padding: 18px 24px;
-  font-family: var(--mono);
-  font-size: 11px;
-  border-right: 1px solid rgba(201,168,76,0.08);
-  line-height: 1.5;
-}
-.spec-cell:last-child { border-right: none; }
-.spec-row.header .spec-cell {
-  font-size: 9px;
-  color: var(--gold);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-.spec-name { color: var(--paper); }
-.spec-val { color: rgba(245,242,236,0.55); }
-.spec-val.good { color: #5daa7f; }
-.spec-val.warn { color: var(--gold); }
-
-.parts-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1px; background: rgba(201,168,76,0.08);
-  border: 1px solid rgba(201,168,76,0.08);
-  margin-top: 48px;
-}
-.part-card {
-  background: var(--steel);
-  padding: 28px 24px;
-  transition: background 0.25s;
-}
-.part-card:hover { background: #243447; }
-.part-cat {
-  font-family: var(--mono); font-size: 9px;
-  color: var(--gold); letter-spacing: 0.2em;
-  text-transform: uppercase; margin-bottom: 8px;
-}
-.part-name { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--paper); margin-bottom: 4px; }
-.part-spec { font-family: var(--mono); font-size: 10px; color: rgba(245,242,236,0.4); line-height: 1.6; }
-
-/* INVESTOR SECTION */
-.investor-section {
-  background: var(--paper);
-  display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0;
-}
-.investor-left { padding: 120px 80px; display: flex; flex-direction: column; justify-content: center; }
-.investor-right {
-  background: var(--gold);
-  padding: 120px 80px;
-  display: flex; flex-direction: column; justify-content: center;
-}
-.investor-right .section-tag { color: var(--ink); }
-.investor-right .section-tag::before { background: var(--ink); }
-.investor-right .section-h2 { color: var(--ink); }
-.investor-right .section-h2 em { color: #7a5a1a; }
-.investor-right .section-lead { color: rgba(10,10,10,0.6); }
-
-.traction-items { margin-top: 40px; display: flex; flex-direction: column; gap: 0; }
-.traction-item {
-  display: flex; gap: 24px; align-items: flex-start;
-  padding: 24px 0; border-bottom: 1px solid var(--mist);
-}
-.traction-item:last-child { border-bottom: none; }
-.t-n { font-family: var(--serif); font-size: 40px; font-weight: 300; color: var(--gold); line-height: 1; flex-shrink: 0; }
-.t-body { display: flex; flex-direction: column; gap: 4px; }
-.t-label { font-family: var(--sans); font-size: 14px; font-weight: 600; }
-.t-sub { font-family: var(--mono); font-size: 10px; color: #888; }
-
-.ask-items { margin-top: 40px; display: flex; flex-direction: column; gap: 16px; }
-.ask-item {
-  padding: 20px 24px;
-  background: rgba(10,10,10,0.08);
-  display: flex; justify-content: space-between; align-items: center;
-}
-.ask-k { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink); }
-.ask-v { font-family: var(--mono); font-size: 12px; color: #7a5a1a; }
-
-/* CTA / FOOTER */
-.cta-section {
-  background: var(--ink);
-  padding: 120px 80px;
-  text-align: center;
-  position: relative; overflow: hidden;
-}
-.cta-section::before {
-  content: 'SOLEBOT';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: var(--serif);
-  font-size: 220px;
-  font-weight: 300;
-  font-style: italic;
-  color: rgba(201,168,76,0.04);
-  white-space: nowrap;
-  pointer-events: none;
-}
-.cta-section .section-tag { justify-content: center; }
-.cta-section .section-tag::before { display: none; }
-.cta-section .section-h2 { color: var(--paper); margin: 0 auto 20px; }
-.cta-section .section-lead { color: rgba(245,242,236,0.4); margin: 0 auto 48px; }
-.cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-
-footer {
-  background: #050505;
-  padding: 32px 80px;
-  display: flex; justify-content: space-between; align-items: center;
-}
-.footer-logo { font-family: var(--sans); font-size: 12px; font-weight: 700; letter-spacing: 0.3em; color: rgba(245,242,236,0.3); }
-.footer-note { font-family: var(--mono); font-size: 10px; color: rgba(245,242,236,0.2); }
-
-/* ANIMATIONS */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.reveal { opacity: 0; }
-.reveal.visible { animation: fadeInUp 0.7s ease forwards; }
-
-/* ACTIVE BAY ANIMATION */
-.bay-1 { animation-delay: 0s; }
-.bay-2 { animation-delay: 0.5s; }
-.bay-3 { animation-delay: 1s; }
-
 </style>
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
+<div class="engineering-banner">Engineering Phase // Prototype Deployment Commencing Soon</div>
+
+<div id="cur"></div>
+<div id="cur-r"></div>
+<canvas id="particles"></canvas>
 
 <nav>
-  <div class="nav-logo">SoleBot</div>
-  <div class="nav-links">
-    <a href="#how">Process</a>
-    <a href="#modes">Modes</a>
-    <a href="#luxury">Luxury</a>
-    <a href="#specs">Specs</a>
-    <a href="#invest">Invest</a>
+  <div class="logo">Sole<span>Bot</span></div>
+  <div class="nav-right">
+    <a href="#why-us" class="nav-link">Why SoleBot</a>
+    <a href="#process" class="nav-link">The Protocol</a>
+    <a href="#simulation" class="nav-link">Simulation</a>
+    <a href="mailto:invest@solebot.in" class="nav-cta">Partner with us</a>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero" style="padding:0">
-  <div class="hero-left reveal">
-    <div class="hero-eyebrow">India's first intelligent shoe care system</div>
-    <h1 class="hero-h1">Clean smarter.<br><em>Damage nothing.</em></h1>
-    <p class="hero-sub">Automated, sensor-driven shoe cleaning for ₹300 sneakers and ₹2 lakh Berlutis — same machine, different intelligence.</p>
-    <div class="hero-ctas">
-      <a href="#invest" class="btn-primary">Partner with us</a>
-      <a href="#how" class="btn-ghost">See how it works</a>
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  
+  <div class="hero-left rz-l">
+    <div class="hero-badge"><span class="badge-dot"></span>India's First Intelligent Shoe Care</div>
+    <h1 class="hero-h1"><em>Intelligent.</em><span class="outline">Precise.</span>Safe.</h1>
+    <p class="hero-sub">SoleBot reads your shoe before it touches it. Material ID, contamination scan, and exact estimated service time — all before any physical service begins.</p>
+    <div class="hero-btns">
+      <a href="#process" class="btn-g">See the protocol</a>
+      <a href="#simulation" class="btn-o">Live Simulation</a>
     </div>
   </div>
-  <div class="hero-right">
-    <div class="machine-viz reveal">
-      <div class="data-card data-card-1">
-        <div class="data-label">Material detected</div>
-        <div class="data-value">Full-grain <span>leather</span></div>
+
+  <div class="hero-right rz-r">
+    <div class="hero-machine-ui">
+      <div class="scan-line"></div>
+      <div class="hm-header">
+        <div>SYS.MAPPING_ACTIVE</div>
+        <div>BAY_01_SENSOR_FEED</div>
       </div>
-      <div class="data-card data-card-2">
-        <div class="data-label">Contamination score</div>
-        <div class="data-value"><span>42</span> / 100</div>
-      </div>
-      <div class="machine-body">
-        <div class="machine-screen">
-          <div class="screen-line"></div>
-          <div class="screen-text">
-            &gt; SCANNING...<br>
-            NIR: LEATHER<br>
-            MUD: 42/100<br>
-            PROTOCOL: D<br>
-            TIME: 11 min<br>
-            &gt; CONFIRM? _
-          </div>
-        </div>
-        <div class="machine-slot"><span>insert shoe</span></div>
-        <div class="machine-bays">
-          <div class="bay active bay-1"></div>
-          <div class="bay active bay-2"></div>
-          <div class="bay bay-3"></div>
-        </div>
-        <div class="machine-base"><div class="machine-base-line"></div></div>
+      <div class="hm-body">
+        > INITIALIZING DEPTH SCAN... <br>
+        > MUD TOPOLOGY: <span>42/100 (MODERATE)</span><br>
+        > FIRING NIR LASER: <span>1680nm PEAK</span><br>
+        > MATERIAL DETECTED: <span class="hm-highlight">PREMIUM CANVAS/MESH ✓</span><br>
+        > PREPARING PROTOCOL: <span>B (SURFACE SAFE)</span>
       </div>
     </div>
-    <div class="hero-stats reveal">
-      <div class="hero-stat">
-        <div class="stat-n">40<sub>ml</sub></div>
-        <div class="stat-label">Max water used</div>
+    
+    <div class="hero-stats-box">
+      <div class="hs-item">
+        <div class="hs-val">40<sub>ml</sub></div>
+        <div class="hs-lab">Max Water Used</div>
       </div>
-      <div class="hero-stat">
-        <div class="stat-n">8<sub>s</sub></div>
-        <div class="stat-label">Detection time</div>
+      <div class="hs-item">
+        <div class="hs-val">8<sub>s</sub></div>
+        <div class="hs-lab">Detection Time</div>
       </div>
-      <div class="hero-stat">
-        <div class="stat-n">4</div>
-        <div class="stat-label">Cleaning modes</div>
+      <div class="hs-item">
+        <div class="hs-val">4</div>
+        <div class="hs-lab">Cleaning Modes</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="how-section" id="how">
-  <div class="section-tag">The process</div>
-  <h2 class="section-h2">Three gates before<br><em>anything touches your shoe.</em></h2>
-  <p class="section-lead">Detection → assessment → consent. Only then does cleaning begin. It's a protocol, not a car wash.</p>
-
-  <div class="steps-grid">
-    <div class="step-card reveal">
-      <div class="step-number">01</div>
-      <div class="step-tag">Contamination gate</div>
-      <div class="step-title">Mud scoring via depth geometry</div>
-      <div class="step-desc">A 3D depth sensor maps the sole in 2 seconds. Mud adds 3–8mm of irregular topology. Score 0–100 determines routing — not a photo, a geometry map.</div>
-      <span class="step-badge">0.5 bar · 60 Hz vibration</span>
+<section class="why-sec sec" id="why-us">
+  <div class="rz">
+    <div class="sec-tag">The SoleBot Advantage</div>
+    <h2 class="sec-h2">Built for the elements.<br><em>Designed for the elite.</em></h2>
+    <p class="sec-lead">From heavy monsoon clay to fragile luxury materials, human error is no longer part of the shoe care equation.</p>
+  </div>
+  
+  <div class="why-grid">
+    <div class="why-card rz delay1">
+       <div class="why-img">
+         <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=600&q=80" alt="Muddy conditions">
+       </div>
+       <div class="why-content">
+         <h3>Monsoon-Ready Extraction</h3>
+         <p>Rainy seasons ruin shoes. Our 3D depth sensors and 60Hz vibration plates isolate and extract caked mud without driving it deeper into the fabric with water.</p>
+       </div>
     </div>
-    <div class="step-card reveal">
-      <div class="step-number">02</div>
-      <div class="step-tag">Material gate</div>
-      <div class="step-title">NIR spectroscopy on the upper</div>
-      <div class="step-desc">Near-infrared light bounces off the upper and returns a molecular signature. Leather, suede, canvas, mesh, PU — each uniquely identifiable. Cannot be fooled by colour or lighting.</div>
-      <span class="step-badge">1680nm · 2300nm peaks</span>
+    
+    <div class="why-card rz delay2">
+       <div class="why-img">
+         <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=600&q=80" alt="Luxury sneakers">
+       </div>
+       <div class="why-content">
+         <h3>Luxury Brand Protection</h3>
+         <p>Got top-tier Jordans, Yeezys, or Berlutis? NIR spectroscopy ensures zero-water protocols for leathers and 15 RPM goat-hair brushes for exotics. We handle them flawlessly.</p>
+       </div>
     </div>
-    <div class="step-card reveal">
-      <div class="step-number">03</div>
-      <div class="step-tag">Consent gate</div>
-      <div class="step-title">Quote → pay → 360° pre-capture</div>
-      <div class="step-desc">Price and time shown before cleaning. Customer pays. A full 360° video is recorded as the legal pre-service condition record. Only then does any mechanism touch the shoe.</div>
-      <span class="step-badge">Pre-service legal record</span>
-    </div>
-    <div class="step-card reveal">
-      <div class="step-number">04</div>
-      <div class="step-tag">Cleaning</div>
-      <div class="step-title">Adaptive protocol execution</div>
-      <div class="step-desc">The shoe rotates at 6 RPM on a honeycomb platform. A stationary brush head applies the right method. Pressure is servo-controlled at ±0.1 N. No guessing.</div>
-      <span class="step-badge">6 RPM · ±0.1 N control</span>
-    </div>
-    <div class="step-card reveal">
-      <div class="step-number">05</div>
-      <div class="step-tag">Drying</div>
-      <div class="step-title">Material-calibrated warm air</div>
-      <div class="step-desc">Canvas: 55°C, 4 minutes. Leather: 38°C, 6 minutes. Heat enters from above and below simultaneously. No infra-red, no direct heat contact.</div>
-      <span class="step-badge">38–55°C · dual-channel</span>
-    </div>
-    <div class="step-card reveal">
-      <div class="step-number">06</div>
-      <div class="step-tag">Documentation</div>
-      <div class="step-title">Post-service capture + delivery</div>
-      <div class="step-desc">Before/after video stored and sent to customer's phone. Service record includes method used, parameters logged, timestamp. Full accountability.</div>
-      <span class="step-badge">Before + after · cloud stored</span>
+    
+    <div class="why-card rz delay3">
+       <div class="why-img">
+         <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Multiple shoes">
+       </div>
+       <div class="why-content">
+         <h3>Infinite Pod Deployment</h3>
+         <p>Have an entire collection? Deploy them to our automated pods. Our multi-bay system processes multiple pairs simultaneously with zero bottlenecks.</p>
+       </div>
     </div>
   </div>
 </section>
 
-<!-- CLEANING MODES -->
-<section class="modes-section" id="modes">
-  <div class="section-tag">Adaptive intelligence</div>
-  <h2 class="section-h2">Four protocols.<br><em>One machine.</em></h2>
-  <p class="section-lead">Each mode is engineered for a specific material and contamination state. The machine selects — you confirm.</p>
+<section class="process-sec sec" id="process">
+  <div class="rz">
+    <div class="sec-tag">The SoleBot Protocol</div>
+    <h2 class="sec-h2">Three gates before<br><em>the actual service begins.</em></h2>
+    <p class="sec-lead">Accountability and precision first. The machine analyzes the contamination, provides an estimated service time, and captures the exact pre-condition.</p>
+  </div>
 
-  <div class="modes-grid">
-    <div class="mode-card reveal">
-      <div class="mode-icon">A</div>
-      <div class="mode-label">Mode A — score 0–25</div>
-      <div class="mode-title">Light dust<br>protocol</div>
-      <div class="mode-desc">Microfibre drum at 120 RPM removes surface particles mechanically. Electrostatic pad lifts PM2.5-level fine dust. Zero water. The right tool for a shoe that just needs a refresh.</div>
-      <div class="mode-specs">
-        <div class="mode-spec"><span class="spec-k">Water</span><span class="spec-v">0 ml</span></div>
-        <div class="mode-spec"><span class="spec-k">Duration</span><span class="spec-v">3–4 min</span></div>
-        <div class="mode-spec"><span class="spec-k">Method</span><span class="spec-v">Mechanical + electrostatic</span></div>
-        <div class="mode-spec"><span class="spec-k">Safe for</span><span class="spec-v">All materials</span></div>
-      </div>
+  <div class="gates">
+    <div class="gate-card rz delay1">
+      <div class="gate-num">1</div>
+      <div class="gate-icon">📡</div>
+      <div class="gate-label">Gate One — Assessment & Pre-Clean</div>
+      <div class="gate-title">Read the shoe.<br>Score the dirt.</div>
+      <div class="gate-desc">A 3D depth sensor maps mud intensity. If heavy, a dry vibration pre-clean removes caked dirt safely. The system calculates your estimated service time right here based on accumulation.</div>
     </div>
-    <div class="mode-card reveal">
-      <div class="mode-icon">B</div>
-      <div class="mode-label">Mode B — score 26–60</div>
-      <div class="mode-title">Normal dirt<br>protocol</div>
-      <div class="mode-desc">pH-neutral foam applied as expanding mist. Surrounds dirt particles without driving them deeper. 45-second dwell. Soft nylon brush at 80 RPM. 40ml targeted rinse at 0.2 bar — never touching the sole seam.</div>
-      <div class="mode-specs">
-        <div class="mode-spec"><span class="spec-k">Water</span><span class="spec-v">40 ml</span></div>
-        <div class="mode-spec"><span class="spec-k">Duration</span><span class="spec-v">8–10 min</span></div>
-        <div class="mode-spec"><span class="spec-k">Method</span><span class="spec-v">Foam + brush + micro-rinse</span></div>
-        <div class="mode-spec"><span class="spec-k">Safe for</span><span class="spec-v">Canvas, mesh, synthetic</span></div>
-      </div>
+    <div class="gate-card rz delay2">
+      <div class="gate-num">2</div>
+      <div class="gate-icon">📸</div>
+      <div class="gate-label">Gate Two — Pre-Condition Capture</div>
+      <div class="gate-title">Total accountability<br>recorded instantly.</div>
+      <div class="gate-desc">A full 360° video documents the exact state of your footwear. This creates a legal pre-service condition record for total accountability before any deep cleaning sequence initiates.</div>
     </div>
-    <div class="mode-card reveal">
-      <div class="mode-icon">C</div>
-      <div class="mode-label">Mode C — score 61–100</div>
-      <div class="mode-title">Heavy mud<br>protocol</div>
-      <div class="mode-desc">Two-stage. Mud chamber first: 60Hz vibration dislodges caked clay, air blast at 3 bar clears sole grooves. Only then does the shoe transfer to the main bay for upper cleaning. Indian clay-heavy mud requires mechanical removal before any liquid — it seals pores.</div>
-      <div class="mode-specs">
-        <div class="mode-spec"><span class="spec-k">Pre-clean</span><span class="spec-v">Vibration + air blast</span></div>
-        <div class="mode-spec"><span class="spec-k">Duration</span><span class="spec-v">12–15 min</span></div>
-        <div class="mode-spec"><span class="spec-k">Method</span><span class="spec-v">Mechanical isolation + foam</span></div>
-        <div class="mode-spec"><span class="spec-k">Safe for</span><span class="spec-v">All except bare suede</span></div>
-      </div>
-    </div>
-    <div class="mode-card reveal">
-      <div class="mode-icon">D</div>
-      <div class="mode-label">Mode D — leather</div>
-      <div class="mode-title">Leather & suede<br>protocol</div>
-      <div class="mode-desc">pH 6.5 leather foam. Genuine horsehair brush at 40 RPM. Zero rinse water — the foam is lifted, not rinsed. Lanolin conditioner mist restores oils stripped by cleaning. Ambient-temperature dry at 38°C max. Identical to what a cobbler does by hand.</div>
-      <div class="mode-specs">
-        <div class="mode-spec"><span class="spec-k">Water</span><span class="spec-v">0 ml</span></div>
-        <div class="mode-spec"><span class="spec-k">Duration</span><span class="spec-v">10–12 min</span></div>
-        <div class="mode-spec"><span class="spec-k">Method</span><span class="spec-v">Foam lift + condition</span></div>
-        <div class="mode-spec"><span class="spec-k">Safe for</span><span class="spec-v">Full-grain, nubuck, suede</span></div>
-      </div>
+    <div class="gate-card rz delay3">
+      <div class="gate-num">3</div>
+      <div class="gate-icon">⏱️</div>
+      <div class="gate-label">Gate Three — Material ID & Consent</div>
+      <div class="gate-title">Time generated.<br>You decide.</div>
+      <div class="gate-desc">NIR spectroscopy identifies the exact material. Based on the fabric protocol, a precise estimated service time pops up. Actual cleaning begins only after you confirm the protocol.</div>
     </div>
   </div>
 </section>
 
-<!-- DETECTION DEEP DIVE -->
-<section class="detect-section" id="detect" style="padding:0">
-  <div class="detect-left">
-    <div class="section-tag" style="color:var(--gold)">Detection engine</div>
-    <h2 class="section-h2" style="color:var(--paper)">The machine sees what<br><em>cameras cannot.</em></h2>
-    <p class="section-lead">NIR spectroscopy identifies material at the molecular level. A camera sees colour. NIR sees the difference between cowhide collagen and PU polymer — in under one second.</p>
-    <div class="detect-metrics">
-      <div class="d-metric reveal">
-        <div class="d-metric-label">Detection time</div>
-        <div class="d-metric-val">&lt;1 <span class="d-metric-unit">sec</span></div>
-      </div>
-      <div class="d-metric reveal">
-        <div class="d-metric-label">Material classes</div>
-        <div class="d-metric-val">6 <span class="d-metric-unit">types</span></div>
-      </div>
-      <div class="d-metric reveal">
-        <div class="d-metric-label">NIR confidence</div>
-        <div class="d-metric-val">95 <span class="d-metric-unit">%</span></div>
-      </div>
-      <div class="d-metric reveal">
-        <div class="d-metric-label">Sensor cost at scale</div>
-        <div class="d-metric-val">₹800 <span class="d-metric-unit">/ unit</span></div>
-      </div>
-    </div>
+<section class="scale-section sec" id="scale">
+  <div class="sec-tag rz">System Scaling</div>
+  <h2 class="sec-h2 rz">Cluster <em>Autonomy.</em></h2>
+  <p class="sec-lead rz">Deploy assets to the 7-bay cluster and watch the sensors initialize. Designed for high-volume airport and mall throughput.</p>
+  
+  <div class="btn-controls rz">
+    <button class="btn-g" id="btnDeploy">Deploy Asset to Bay</button>
+    <button class="btn-o" id="btnClear">Clear Cluster</button>
   </div>
-  <div class="detect-right">
-    <div class="terminal reveal">
-      <div class="t-line"><span class="t-prompt">›</span> <span>BOOT SOLEBOT_OS</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-out">depth_scan.start()</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-ok">DEPTH OK — sole_delta: 4.2mm</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-warn">MUD_SCORE: 42 → MODE_C_LIGHT</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-out">nir_sensor.fire(1680nm)</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-ok">MATERIAL: FULL_GRAIN_LEATHER</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-ok">CONFIDENCE: 97.3%</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-high">PROTOCOL: D (leather + mud_pre)</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-out">quote.generate()</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-high">TIME: 13min · PRICE: ₹149</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-out">await customer.confirm()</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span>CONFIRMED via UPI ✓</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-out">capture.360deg.start()</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span class="t-ok">PRE-SERVICE RECORD SAVED</span></div>
-      <div class="t-line"><span class="t-prompt">›</span> <span>CLEANING SEQUENCE INITIATED <span class="t-blink"></span></span></div>
-    </div>
+
+  <div class="scale-grid rz">
+    <div class="bay-unit"><div class="bay-beam"></div><div class="shoe-cluster-holo">👟</div><span class="bay-label">BAY_01</span></div>
+    <div class="bay-unit"><div class="bay-beam"></div><div class="shoe-cluster-holo">👟</div><span class="bay-label">BAY_02</span></div>
+    <div class="bay-unit"><div class="bay-beam"></div><div class="shoe-cluster-holo">👟</div><span class="bay-label">BAY_03</span></div>
+    <div class="bay-unit"><div class="bay-beam"></div><div class="shoe-cluster-holo">👟</div><span class="bay-label">BAY_04</span></div>
+    <div class="bay-unit"><div class="bay-beam"></div><div class="shoe-cluster-holo">👟</div><span class="bay-label">BAY_05</span></div>
+    <div class="bay-unit"><div class="bay-beam"></div><div class="shoe-cluster-holo">👟</div><span class="bay-label">BAY_06</span></div>
+    <div class="bay-unit"><div class="bay-beam"></div><div class="shoe-cluster-holo">👟</div><span class="bay-label">BAY_07</span></div>
   </div>
 </section>
 
-<!-- LUXURY -->
-<section class="luxury-section" id="luxury" style="padding:0">
-  <div class="luxury-left">
-    <div class="section-tag">Luxury mode</div>
-    <h2 class="section-h2">For the shoe that cost<br><em>more than a motorcycle.</em></h2>
-    <p class="section-lead">When NIR detects patent leather, exotic hide, or nubuck — or the customer declares a luxury item — the entire cleaning physics changes. Not just softer. Different.</p>
-    <div class="luxury-features">
-      <div class="luxury-feat reveal">
-        <div class="lf-num">01</div>
-        <div>
-          <div class="lf-title">15 RPM goat-hair brush</div>
-          <div class="lf-desc">Standard is 80 RPM nylon. Luxury mode uses genuine goat hair at 15 RPM — barely moving. The contact force is below what you feel on your own skin.</div>
-        </div>
-      </div>
-      <div class="luxury-feat reveal">
-        <div class="lf-num">02</div>
-        <div>
-          <div class="lf-title">Zero water contact</div>
-          <div class="lf-desc">No rinse, no mist. Foam is applied and lifted — never washed. A dry microfibre cloth removes residue. Waterlogging a Berluti sole destroys the welt stitching.</div>
-        </div>
-      </div>
-      <div class="luxury-feat reveal">
-        <div class="lf-num">03</div>
-        <div>
-          <div class="lf-title">L-fork heel support</div>
-          <div class="lf-desc">A mechanical fork slides under the heel while the gripper holds the upper. Weight is distributed — no stress on the sole-upper bond of structurally complex shoes.</div>
-        </div>
-      </div>
-      <div class="luxury-feat reveal">
-        <div class="lf-num">04</div>
-        <div>
-          <div class="lf-title">Lanolin conditioner mist + wrapping</div>
-          <div class="lf-desc">Post-clean, lanolin is misted onto the upper. The shoe is returned wrapped in acid-free tissue. The customer's shoe comes back in better condition than it arrived.</div>
-        </div>
-      </div>
+<section class="sim-section" id="simulation">
+  <div class="sim-header-wrap rz">
+    <div>
+      <div class="sec-tag">Interactive service simulation</div>
+      <h2 class="sec-h2">Watch a full service<br><em>unfold in real-time.</em></h2>
+      <p class="sec-lead">From dirty drop-off to clean pickup. One continuous workflow using the actual machine logic.</p>
     </div>
+    <button class="btn-sim-start" id="startSimBtn">▶ Start Realtime Simulation</button>
   </div>
-  <div class="luxury-right">
-    <div class="section-tag">Shoe value spectrum</div>
-    <h2 class="section-h2" style="font-size:32px">One machine handles<br><em>the full range.</em></h2>
-    <div class="shoe-price-chart reveal" style="margin-top:48px">
-      <div class="price-bar">
-        <div class="bar-label">Canvas</div>
-        <div class="bar-track"><div class="bar-fill" style="width:15%"></div></div>
-        <div class="bar-value">₹500–2K</div>
+  
+  <div class="sim-wrapper">
+    <div class="sim-screen rz-l">
+      <div class="sim-header">
+        <div class="sim-dots"><div class="sim-dot" style="background:#ff5f57"></div><div class="sim-dot" style="background:#febc2e"></div><div class="sim-dot" style="background:#28c840"></div></div>
+        <div class="sim-title">SOLEBOT OS v2.1 — BAY_01</div>
       </div>
-      <div class="price-bar">
-        <div class="bar-label">Sneaker</div>
-        <div class="bar-track"><div class="bar-fill" style="width:30%"></div></div>
-        <div class="bar-value">₹2K–10K</div>
-      </div>
-      <div class="price-bar">
-        <div class="bar-label">Leather</div>
-        <div class="bar-track"><div class="bar-fill" style="width:55%"></div></div>
-        <div class="bar-value">₹5K–30K</div>
-      </div>
-      <div class="price-bar">
-        <div class="bar-label">Premium</div>
-        <div class="bar-track"><div class="bar-fill" style="width:75%"></div></div>
-        <div class="bar-value">₹30K–1L</div>
-      </div>
-      <div class="price-bar">
-        <div class="bar-label">Luxury</div>
-        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
-        <div class="bar-value">₹1L–2L+</div>
-      </div>
-    </div>
-    <p style="font-family:var(--mono);font-size:11px;color:#888;margin-top:28px;line-height:1.8;">Luxury mode activates automatically at ₹1L+ via brand detection or customer declaration. The machine does not charge more for being careful. Luxury mode is a separate service tier with premium pricing.</p>
-  </div>
-</section>
+      <div class="sim-body">
+        
+        <div class="sim-chamber">
+           <div class="sim-laser" id="chLaser"></div>
+           <div class="sim-flash" id="chFlash"></div>
+           <div class="sim-done-glow" id="chGlow"></div>
+           
+           <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&q=80&w=600" class="sim-chamber-shoe dirty-state" id="chShoe" alt="Shoe Asset">
+           
+           <div class="sim-foam" id="chFoam"></div>
+           <div class="sim-mesh-base"></div>
 
-<!-- MANUFACTURER SPECS -->
-<section class="specs-section" id="specs">
-  <div class="section-tag" style="color:var(--gold)">For manufacturers</div>
-  <h2 class="section-h2" style="color:var(--paper)">Build sheet &<br><em>component spec.</em></h2>
-  <p class="section-lead">Designed for modular manufacture. Each bay is identical — stack vertically for 7-bay system. Single-bay prototype confirms all critical systems.</p>
-
-  <div class="specs-table reveal">
-    <div class="spec-row header">
-      <div class="spec-cell">Component</div>
-      <div class="spec-cell">Spec</div>
-      <div class="spec-cell">Supplier type</div>
-      <div class="spec-cell">Status</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">Bay shell</div>
-      <div class="spec-cell spec-val">316 SS · 320×360×300mm · 3–5° sloped floor</div>
-      <div class="spec-cell spec-val">Metal fabricator</div>
-      <div class="spec-cell spec-val good">Prototype ready</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">AI compute</div>
-      <div class="spec-cell spec-val">NVIDIA Jetson Orin Nano · 8GB</div>
-      <div class="spec-cell spec-val">Electronics distributor</div>
-      <div class="spec-cell spec-val good">Available</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">Cameras</div>
-      <div class="spec-cell spec-val">5MP global shutter USB 3.0 × 4 · 35° inward</div>
-      <div class="spec-cell spec-val">Machine vision</div>
-      <div class="spec-cell spec-val good">Available</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">NIR sensor</div>
-      <div class="spec-cell spec-val">1680nm / 2300nm · ceiling mount · 90°</div>
-      <div class="spec-cell spec-val">Spectroscopy supplier</div>
-      <div class="spec-cell spec-val good">Available</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">Steam generator</div>
-      <div class="spec-cell spec-val">3 kW · shared across bays · purge-air solenoid</div>
-      <div class="spec-cell spec-val">Industrial</div>
-      <div class="spec-cell spec-val good">Available</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">Gantry rail</div>
-      <div class="spec-cell spec-val">3-axis Cartesian · 700mm X-travel · yaw servo</div>
-      <div class="spec-cell spec-val">Automation supplier</div>
-      <div class="spec-cell spec-val warn">V2 (prototype: manual)</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">Honeycomb mesh</div>
-      <div class="spec-cell spec-val">316 SS · food-grade epoxy · 1.5 bar self-clean nozzles</div>
-      <div class="spec-cell spec-val">Metal fabricator</div>
-      <div class="spec-cell spec-val good">Prototype ready</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">Vibration plate</div>
-      <div class="spec-cell spec-val">60 Hz · rubber-dampened sub-frame (isolated)</div>
-      <div class="spec-cell spec-val">Industrial</div>
-      <div class="spec-cell spec-val good">Prototype ready</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">Water system</div>
-      <div class="spec-cell spec-val">5μ inline filter · 3-way solenoid · 2s purge-air</div>
-      <div class="spec-cell spec-val">Plumbing / industrial</div>
-      <div class="spec-cell spec-val good">Prototype ready</div>
-    </div>
-    <div class="spec-row">
-      <div class="spec-cell spec-name">Laser proximity</div>
-      <div class="spec-cell spec-val">8 × ring mount · 22mm height · horizontal</div>
-      <div class="spec-cell spec-val">Automation supplier</div>
-      <div class="spec-cell spec-val warn">V2</div>
-    </div>
-  </div>
-
-  <div style="margin-top:80px">
-    <div class="section-tag" style="color:var(--gold)">Immediate procurement</div>
-    <h3 style="font-family:var(--serif);font-size:28px;font-weight:300;color:var(--paper);margin-bottom:8px">Order these first for v1 prototype.</h3>
-    <p style="font-family:var(--mono);font-size:11px;color:rgba(245,242,236,0.4);margin-bottom:0">Everything else can be sourced during fabrication.</p>
-  </div>
-
-  <div class="parts-grid reveal">
-    <div class="part-card">
-      <div class="part-cat">Compute</div>
-      <div class="part-name">Jetson Orin Nano</div>
-      <div class="part-spec">NVIDIA · 8GB · AI inference<br>Material + brand detection</div>
-    </div>
-    <div class="part-card">
-      <div class="part-cat">Vision</div>
-      <div class="part-name">Global shutter cam ×4</div>
-      <div class="part-spec">5MP · USB 3.0 · no motion blur<br>360° scan during rotation</div>
-    </div>
-    <div class="part-card">
-      <div class="part-cat">Spectroscopy</div>
-      <div class="part-name">NIR sensor</div>
-      <div class="part-spec">Near-infrared · ceiling mount<br>Material ID in &lt;1 second</div>
-    </div>
-    <div class="part-card">
-      <div class="part-cat">Thermal</div>
-      <div class="part-name">3 kW steam generator</div>
-      <div class="part-spec">Shared across all bays<br>+ 3-way purge solenoid</div>
-    </div>
-    <div class="part-card">
-      <div class="part-cat">Mechanical</div>
-      <div class="part-name">Cartesian gantry kit</div>
-      <div class="part-spec">700mm X-travel<br>Yaw servo wrist (V2)</div>
-    </div>
-    <div class="part-card">
-      <div class="part-cat">Safety</div>
-      <div class="part-name">Thermal fuse</div>
-      <div class="part-spec">Hardware cutoff · hardwired<br>Not firmware — physical</div>
-    </div>
-  </div>
-</section>
-
-<!-- INVESTOR -->
-<section class="investor-section" id="invest" style="padding:0">
-  <div class="investor-left">
-    <div class="section-tag">Traction</div>
-    <h2 class="section-h2">The numbers<br><em>that matter.</em></h2>
-    <p class="section-lead">Early prototype phase. These are the metrics we are building toward for Series A.</p>
-    <div class="traction-items">
-      <div class="traction-item reveal">
-        <div class="t-n">₹149</div>
-        <div class="t-body">
-          <div class="t-label">Target price per clean (standard)</div>
-          <div class="t-sub">Competitive with human shoe-cleaning shops</div>
+           <div class="ba-container" id="baContainer">
+             <div class="ba-col">
+               <div class="ba-label">Intake Condition</div>
+               <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&q=80&w=600" class="ba-img dirty-state">
+             </div>
+             <div class="ba-col">
+               <div class="ba-label">Post-Service Proof</div>
+               <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?auto=format&fit=crop&q=80&w=600" class="ba-img">
+             </div>
+           </div>
         </div>
-      </div>
-      <div class="traction-item reveal">
-        <div class="t-n">7×</div>
-        <div class="t-body">
-          <div class="t-label">Revenue scale: single → 7-bay</div>
-          <div class="t-sub">Same footprint, same software, 7x throughput</div>
+
+        <div class="sim-phase-text active" id="text0">
+          <div class="sim-status">Awaiting placement</div>
+          <div class="sim-h">Intake Ready</div>
+          <div class="sim-p">Shoe placed in cradle. Depth scanner maps topology to calculate mud intensity. <b>Accumulation detected: 68/100 (Heavy)</b>.</div>
+          <div class="sim-prog"><div class="sim-prog-fill" style="width:0%"></div></div>
         </div>
-      </div>
-      <div class="traction-item reveal">
-        <div class="t-n">8</div>
-        <div class="t-body">
-          <div class="t-label">Target daily transactions (1 bay)</div>
-          <div class="t-sub">3-hour peak: morning commute + mall traffic</div>
+        
+        <div class="sim-phase-text" id="text1">
+          <div class="sim-status">Depth scan & Pre-clean</div>
+          <div class="sim-h">Gate 1 — Mud Removal</div>
+          <div class="sim-p">60Hz dry vibration active to dislodge caked surface debris safely. Evaluating for appropriate material protocol...</div>
+          <div class="sim-prog"><div class="sim-prog-fill" style="width:20%"></div></div>
         </div>
-      </div>
-      <div class="traction-item reveal">
-        <div class="t-n">₹0</div>
-        <div class="t-body">
-          <div class="t-label">Water cost for leather cleans</div>
-          <div class="t-sub">Zero-water leather protocol = near-zero COGS</div>
+        
+        <div class="sim-phase-text" id="text2">
+          <div class="sim-status">Awaiting confirmation</div>
+          <div class="sim-h">Gate 2 — Material ID & Protocol</div>
+          <div class="sim-p">NIR identifies Premium Canvas/Mesh. Applying Protocol B. <b>Estimated service time: 8 minutes.</b> Waiting for user confirmation to begin.</div>
+          <button id="simConfirmBtn" class="btn-g" style="margin-top:10px; display:none; width:100%;">Confirm Protocol (8 min)</button>
+          <div class="sim-prog"><div class="sim-prog-fill" style="width:40%"></div></div>
+        </div>
+        
+        <div class="sim-phase-text" id="text3">
+          <div class="sim-status" style="color:#5daa7f;">Protocol confirmed ✓</div>
+          <div class="sim-h">Gate 3 — 360° Capture</div>
+          <div class="sim-p">Recording pre-condition accountability footage. Sent securely to customer profile before service begins.</div>
+          <div class="sim-prog"><div class="sim-prog-fill" style="width:60%"></div></div>
+        </div>
+        
+        <div class="sim-phase-text" id="text4">
+          <div class="sim-status">Service in progress</div>
+          <div class="sim-h">Protocol B Executing</div>
+          <div class="sim-p">Adaptive cleaning active. Applying expanding mist foam and soft nylon brush at 80 RPM.</div>
+          <div class="sim-prog"><div class="sim-prog-fill" style="width:85%"></div></div>
+        </div>
+        
+        <div class="sim-phase-text" id="text5">
+          <div class="sim-status done">Service Concluded</div>
+          <div class="sim-h">Wrap & Delivery Record</div>
+          <div class="sim-p">Shoe boxed. Before & After accountability record generated and delivered directly to the customer.</div>
+          <div class="sim-prog"><div class="sim-prog-fill" style="width:100%"></div></div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="investor-right">
-    <div class="section-tag">We are raising</div>
-    <h2 class="section-h2">Seed round<br><em>open now.</em></h2>
-    <p class="section-lead">Building the v1 single-bay prototype and placing it in 3 pilot locations in Hyderabad. Looking for manufacturing partners and early commercial space partners.</p>
-    <div class="ask-items">
-      <div class="ask-item reveal">
-        <div class="ask-k">Use of funds</div>
-        <div class="ask-v">Prototype fabrication</div>
+
+    <div class="sim-steps rz-r" id="simTracker">
+      <div class="sim-step active" id="track0">
+        <div class="ss-num">01</div>
+        <div class="ss-body">
+          <div class="ss-title">Intake Phase</div>
+          <div class="ss-desc">Shoe dropped securely onto mesh cradle. System calculates mud accumulation.</div>
+        </div>
       </div>
-      <div class="ask-item reveal">
-        <div class="ask-k">Pilot locations</div>
-        <div class="ask-v">Malls · Airports · Tech parks</div>
+      <div class="sim-step" id="track1">
+        <div class="ss-num">02</div>
+        <div class="ss-body">
+          <div class="ss-title">Mud Removal</div>
+          <div class="ss-desc">Dry vibration clears caked mud to prepare the surface.</div>
+        </div>
       </div>
-      <div class="ask-item reveal">
-        <div class="ask-k">Manufacturing partner</div>
-        <div class="ask-v">Bay + mechanical systems</div>
+      <div class="sim-step" id="track2">
+        <div class="ss-num">03</div>
+        <div class="ss-body">
+          <div class="ss-title">Estimate & Confirmation</div>
+          <div class="ss-desc">Material ID confirmed. Estimated time presented. Customer confirms to begin.</div>
+        </div>
       </div>
-      <div class="ask-item reveal">
-        <div class="ask-k">Timeline to prototype</div>
-        <div class="ask-v">90 days from funding</div>
+      <div class="sim-step" id="track3">
+        <div class="ss-num">04</div>
+        <div class="ss-body">
+          <div class="ss-title">360° Capture</div>
+          <div class="ss-desc">Pre-condition recorded for absolute accountability.</div>
+        </div>
+      </div>
+      <div class="sim-step" id="track4">
+        <div class="ss-num">05</div>
+        <div class="ss-body">
+          <div class="ss-title">Service Begins</div>
+          <div class="ss-desc">Cleaning protocol executing. Material-safe foam active.</div>
+        </div>
+      </div>
+      <div class="sim-step" id="track5">
+        <div class="ss-num">06</div>
+        <div class="ss-body">
+          <div class="ss-title">Wrap & Delivery Record</div>
+          <div class="ss-desc">Drying complete. Final Before/After proof generated and sent.</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
-<section class="cta-section">
-  <div class="section-tag">Get in touch</div>
-  <h2 class="section-h2">Ready to build<br><em>the future of shoe care?</em></h2>
-  <p class="section-lead">Whether you are a manufacturer, investor, or commercial space partner — we want to hear from you.</p>
-  <div class="cta-btns">
-    <a href="mailto:hello@solebot.in" class="btn-primary">Contact us</a>
-    <a href="#specs" class="btn-ghost">Download spec sheet</a>
-  </div>
-</section>
-
-<footer>
-  <div class="footer-logo">SoleBot</div>
-  <div class="footer-note">Hyderabad, India · Patent pending · 2025</div>
+<footer style="text-align:center; padding:40px; background:#020305; border-top:1px solid rgba(212,168,67,.1);">
+  <div class="f-copy" style="font-family:var(--mono);font-size:10px;color:rgba(240,236,228,.4);">SoleBot © 2026 · Hyderabad, India · Patent pending</div>
 </footer>
 
 <script>
-const cursor = document.getElementById('cursor');
-const ring = document.getElementById('cursorRing');
-let mx = 0, my = 0, rx = 0, ry = 0;
+(function() {
+  'use strict';
 
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx + 'px';
-  cursor.style.top = my + 'px';
-});
+  // ── CURSOR ──
+  const cur = document.getElementById('cur');
+  const curR = document.getElementById('cur-r');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;if(cur){cur.style.left=mx+'px';cur.style.top=my+'px';}});
+  function animCur(){rx+=(mx-rx)*.1;ry+=(my-ry)*.1;if(curR){curR.style.left=rx+'px';curR.style.top=ry+'px';}requestAnimationFrame(animCur);}
+  animCur();
 
-function animateRing() {
-  rx += (mx - rx) * 0.12;
-  ry += (my - ry) * 0.12;
-  ring.style.left = rx + 'px';
-  ring.style.top = ry + 'px';
-  requestAnimationFrame(animateRing);
-}
-animateRing();
+  // ── PARTICLES ──
+  const canvas = document.getElementById('particles');
+  if(canvas) {
+    const ctx = canvas.getContext('2d');
+    let W,H,particles=[];
+    function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+    resize();window.addEventListener('resize',resize);
+    for(let i=0;i<60;i++)particles.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.3,a:Math.random()});
+    function drawParticles(){
+      ctx.clearRect(0,0,W,H);
+      particles.forEach(p=>{
+        p.x+=p.vx;p.y+=p.vy;
+        if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+        if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=`rgba(212,168,67,${p.a*.4})`;ctx.fill();
+      });
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+  }
 
-document.querySelectorAll('a, button, .mode-card, .step-card, .part-card').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    cursor.style.width = '16px';
-    cursor.style.height = '16px';
-    ring.style.width = '48px';
-    ring.style.height = '48px';
-  });
-  el.addEventListener('mouseleave', () => {
-    cursor.style.width = '8px';
-    cursor.style.height = '8px';
-    ring.style.width = '32px';
-    ring.style.height = '32px';
-  });
-});
+  // ── REVEALS ──
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');}});
+  },{threshold:0.1});
+  document.querySelectorAll('.rz,.rz-l,.rz-r').forEach(el=>obs.observe(el));
 
-const observer = new IntersectionObserver(entries => {
-  entries.forEach((entry, i) => {
-    if (entry.isIntersecting) {
+  // ── CLUSTER SCALING LOGIC ──
+  const bays = document.querySelectorAll('.bay-unit');
+  const btnDeploy = document.getElementById('btnDeploy');
+  const btnClear = document.getElementById('btnClear');
+
+  if (btnDeploy) {
+    btnDeploy.onclick = function(e) {
+      e.preventDefault();
+      for (let bay of bays) {
+        if (!bay.classList.contains('active')) {
+          bay.classList.add('active');
+          const label = bay.querySelector('.bay-label');
+          if(label) label.innerText = label.innerText.split(' ')[0] + ' [SCANNING]';
+          break;
+        }
+      }
+    };
+  }
+
+  if (btnClear) {
+    btnClear.onclick = function(e) {
+      e.preventDefault();
+      bays.forEach(b => {
+        b.classList.remove('active');
+        const label = b.querySelector('.bay-label');
+        if(label) label.innerText = label.innerText.split(' ')[0];
+      });
+    };
+  }
+
+  // ── REALTIME SIMULATION LOGIC ──
+  const startBtn = document.getElementById('startSimBtn');
+  const simConfirmBtn = document.getElementById('simConfirmBtn');
+  const chShoe = document.getElementById('chShoe');
+  const chLaser = document.getElementById('chLaser');
+  const chFlash = document.getElementById('chFlash');
+  const chFoam = document.getElementById('chFoam');
+  const chGlow = document.getElementById('chGlow');
+  const chBa = document.getElementById('baContainer'); // Before/After overlay
+
+  function updatePhaseUI(phaseIndex) {
+    document.querySelectorAll('.sim-phase-text').forEach(el => el.classList.remove('active'));
+    document.getElementById('text' + phaseIndex).classList.add('active');
+    document.querySelectorAll('.sim-step').forEach(el => el.classList.remove('active'));
+    document.getElementById('track' + phaseIndex).classList.add('active');
+  }
+
+  if (startBtn && simConfirmBtn) {
+    startBtn.addEventListener('click', function() {
+      startBtn.disabled = true;
+      startBtn.innerText = "Simulation Running...";
+
+      // Reset state
+      chShoe.classList.remove('dropped', 'shaking');
+      chShoe.classList.add('dirty-state'); // Apply mud filter
+      chLaser.classList.remove('active');
+      chFlash.classList.remove('active');
+      chFoam.classList.remove('active');
+      chGlow.classList.remove('active');
+      chBa.classList.remove('active'); // Hide B/A overlay
+      simConfirmBtn.style.display = 'none';
+
       setTimeout(() => {
-        entry.target.classList.add('visible');
-      }, 80);
-      observer.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.15 });
+        updatePhaseUI(0);
+        chShoe.classList.add('dropped');
+      }, 500);
 
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+      setTimeout(() => {
+        updatePhaseUI(1);
+        chShoe.classList.add('shaking');
+      }, 3000);
 
-const bars = document.querySelectorAll('.bar-fill');
-const barObs = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const fills = entry.target.querySelectorAll('.bar-fill');
-      fills.forEach(f => { f.style.width = f.style.width; });
-      barObs.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.5 });
+      setTimeout(() => {
+        updatePhaseUI(2);
+        chShoe.classList.remove('shaking');
+        chLaser.classList.add('active'); 
+        simConfirmBtn.style.display = 'inline-block'; 
+      }, 5500);
+    });
 
-const chart = document.querySelector('.shoe-price-chart');
-if (chart) barObs.observe(chart);
+    simConfirmBtn.addEventListener('click', function() {
+      simConfirmBtn.style.display = 'none';
+      chLaser.classList.remove('active');
 
-const screenTexts = [
-  `> SCANNING...\nNIR: LEATHER\nMUD: 42/100\nPROTOCOL: D\nTIME: 11 min\n> CONFIRM? _`,
-  `> SCANNING...\nNIR: CANVAS\nMUD: 18/100\nPROTOCOL: A\nTIME: 4 min\n> CONFIRM? _`,
-  `> SCANNING...\nNIR: SUEDE\nMUD: 78/100\nPROTOCOL: C+D\nTIME: 16 min\n> CONFIRM? _`,
-];
-let si = 0;
-const screenEl = document.querySelector('.screen-text');
-if (screenEl) {
-  setInterval(() => {
-    si = (si + 1) % screenTexts.length;
-    screenEl.style.opacity = '0';
-    setTimeout(() => {
-      screenEl.textContent = screenTexts[si];
-      screenEl.style.opacity = '1';
-    }, 300);
-    screenEl.style.transition = 'opacity 0.3s';
-  }, 3500);
-}
+      updatePhaseUI(3);
+      chFlash.classList.add('active');
+
+      setTimeout(() => {
+        updatePhaseUI(4);
+        chFlash.classList.remove('active');
+        chFoam.classList.add('active');
+        
+        // Remove dirty filter behind foam
+        setTimeout(() => { chShoe.classList.remove('dirty-state'); }, 1200);
+        
+        setTimeout(() => { chFoam.classList.remove('active'); }, 2500);
+
+      }, 2500);
+
+      // Final Phase + Before/After Pop
+      setTimeout(() => {
+        updatePhaseUI(5);
+        chGlow.classList.add('active');
+        
+        // Show Before & After
+        setTimeout(() => { chBa.classList.add('active'); }, 800);
+        
+        startBtn.innerText = "Simulation Complete";
+        
+        setTimeout(() => {
+          startBtn.disabled = false;
+          startBtn.innerText = "▶ Restart Simulation";
+        }, 3000);
+      }, 6500);
+    });
+  }
+})();
 </script>
 </body>
 </html>
